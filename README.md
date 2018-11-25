@@ -29,6 +29,7 @@ To configure this gem with Devise + Rails, follow the steps in this [guide](http
         aws_region: <aws_region>
         callback_path: <!important - route used for cognito callback>,
         client_options: { site: <cognito_url> },
+        info_fields: %[email],
         scope: %i[openid email profile],
         user_pool_id: <cognito_user_pool_id>
 
