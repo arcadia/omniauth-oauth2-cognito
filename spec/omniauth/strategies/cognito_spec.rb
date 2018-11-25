@@ -143,8 +143,19 @@ RSpec.describe OmniAuth::Strategies::Cognito do
 
     describe ':extra' do
       it 'contains the parsed data from the id token' do
-        expect(auth_hash[:extra])
-          .to eql('raw_info' => { 'sub' => id_sub, 'phone_number' => id_phone, 'email' => id_email, 'name' => id_name })
+        expect(auth_hash[:extra]).to eq(
+          'raw_info' => {
+            'sub' => id_sub,
+            'phone_number' => id_phone,
+            'email' => id_email,
+            'name' => id_name,
+            'iss' => 'https://cognito-idp.eu-west-1.amazonaws.com/user_pool_id',
+            'aud' => strategy.options[:client_id],
+            'exp' => token_expires.to_i,
+            'iat' => now.to_i,
+            'nbf' => now.to_i
+          }
+        )
       end
     end
   end

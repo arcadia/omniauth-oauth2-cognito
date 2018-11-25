@@ -15,12 +15,12 @@ module OmniAuth
       option :jwt_leeway, 60
 
       uid do
-        parsed_id_token['sub'] if parsed_id_token
+        parsed_id_token && parsed_id_token['sub']
       end
 
       info do
-        if parsed_id_token
-          {}.tap do |result|
+        {}.tap do |result|
+          if parsed_id_token
             options[:info_fields].each do |field|
               result[field] = parsed_id_token[field.to_s]
             end
@@ -29,16 +29,17 @@ module OmniAuth
       end
 
       credentials do
-        { token: access_token.token }.tap do |hash|
-          hash[:refresh_token] = access_token.refresh_token if access_token.expires? && access_token.refresh_token
-          hash[:expires_at] = access_token.expires_at if access_token.expires?
-          hash[:expires] = access_token.expires?
-          hash[:id_token] = id_token if id_token
-        end
+        {
+          expires: access_token.expires?,
+          expires_at: access_token.expires? && access_token.expires_at,
+          id_token: id_token,
+          refresh_token: access_token.expires? && access_token.refresh_token,
+          token: access_token.token
+        }.compact
       end
 
       extra do
-        { raw_info: parsed_id_token.reject { |key| %w[iss aud exp iat token_use nbf].include?(key) } }
+        { raw_info: parsed_id_token }
       end
 
       private
@@ -58,7 +59,7 @@ module OmniAuth
       end
 
       def id_token
-        access_token['id_token']
+        access_token && access_token['id_token']
       end
 
       def parsed_id_token
