@@ -40,7 +40,7 @@ when configuring the user model, use the following devise setting:
 
     devise :omniauthable, omniauth_providers: %i[cognito]
 
-and make sure the add a route in the routes.rb file that corresponds to the callback_path setting in the devise config above. So if you used `/auth/cognito/callback` for the callback route setting in cognito and in the devise config, then you would set a route like:
+and make sure to add a route in the routes.rb file that corresponds to the callback_path setting in the devise config above. So if you used `/auth/cognito/callback` for the callback route setting in cognito and in the devise config, then you would set a route like:
 
     devise_scope :users do
       get '/auth/cognito/callback', to: 'callbacks#cognito'
@@ -74,4 +74,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Omniauth::Oauth2::Cognito project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/omniauth-oauth2-cognito/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Omniauth::Oauth2::Cognito project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/arcadia/omniauth-oauth2-cognito/blob/master/CODE_OF_CONDUCT.md).
