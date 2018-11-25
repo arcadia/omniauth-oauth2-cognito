@@ -42,7 +42,7 @@ when configuring the user model, use the following devise setting:
 and make sure the add a route in the routes.rb file that corresponds to the callback_path setting in the devise config above. So if you used `/auth/cognito/callback` for the callback route setting in cognito and in the devise config, then you would set a route like:
 
     devise_scope :users do
-      get '/auth/cognito/callback', to: 'users/omniauth_callbacks#cognito'
+      get '/auth/cognito/callback', to: 'callbacks#cognito'
     end
 
 The above route assumes you've set up your callbacks controller at `app/controllers/callbacks_controller.rb` like:
