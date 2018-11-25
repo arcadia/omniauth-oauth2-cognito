@@ -8,7 +8,7 @@ RSpec.describe OmniAuth::Strategies::Cognito do
   let(:strategy) { described_class.new(app, client_id, client_secret, options) }
 
   let(:app) { ->(_env) { [200, '', {}] } }
-  let(:callback_url) { 'http://localhost/auth/cognito-idp/callback?code=1234' } # TODO: tests for this
+  let(:callback_url) { 'http://localhost/auth/cognito/callback?code=1234' } # TODO: tests for this
   let(:client_id) { 'ABCDE' }
   let(:client_secret) { '987654321' }
   let(:options) { {} }
@@ -25,29 +25,52 @@ RSpec.describe OmniAuth::Strategies::Cognito do
 
   it_behaves_like 'an oauth2 strategy'
 
-  describe '#build_access_token' do
+  context 'methods' do
+    let(:access_token_object) { double('OAuth2::AccessToken') }
+    let(:auth_code) { double('OAuth2::AuthCode', get_token: access_token_object) }
+    let(:params) { { 'code' => '12345' } }
+    let(:request) { double('Rack::Request', params: params) }
+
     subject do
       described_class.new(client_id, client_secret, options).tap do |strategy|
         allow(strategy).to receive(:client).and_return(oauth_client)
         allow(strategy).to receive(:request).and_return(request)
-        allow(strategy).to receive(:callback_url).and_return(callback_url)
       end
     end
 
-    let(:auth_code) { double('OAuth2::AuthCode', get_token: access_token_object) }
-    let(:access_token_object) { double('OAuth2::AccessToken') }
+    describe '#build_access_token' do
+      before do
+        allow(subject).to receive(:callback_url).and_return(callback_url)
+      end
 
-    let(:request) { double('Rack::Request', params: params) }
-    let(:params) { { 'code' => '12345' } }
+      it 'does not send the query part of the request URL as callback URL' do
+        expect(auth_code).to receive(:get_token).with(
+          params['code'],
+          { redirect_uri: callback_url }.merge(subject.token_params.to_hash(symbolize_keys: true)),
+          subject.__send__(:deep_symbolize, subject.options.auth_token_params)
+        ).and_return(access_token_object)
 
-    it 'does not send the query part of the request URL as callback URL' do
-      expect(auth_code).to receive(:get_token).with(
-        params['code'],
-        { redirect_uri: callback_url }.merge(subject.token_params.to_hash(symbolize_keys: true)),
-        subject.__send__(:deep_symbolize, subject.options.auth_token_params)
-      ).and_return(access_token_object)
+        expect(subject.__send__(:build_access_token)).to eql access_token_object
+      end
+    end
 
-      expect(subject.__send__(:build_access_token)).to eql access_token_object
+    describe '#callback_url' do
+      before do
+        allow(subject).to receive(:full_host).and_return('http://localhost:3000')
+        allow(subject).to receive(:script_name).and_return('')
+      end
+
+      it 'concatenates the callback_path and the full_host, without query string' do
+        expect(subject.send(:callback_url)).to eq 'http://localhost:3000/auth/cognito/callback'
+      end
+
+      context 'with callback_path option' do
+        let(:options) { { callback_path: '/some/callback/path' } }
+
+        it 'uses custom callback_path' do
+          expect(subject.send(:callback_url)).to eq 'http://localhost:3000/some/callback/path'
+        end
+      end
     end
   end
 
@@ -83,7 +106,7 @@ RSpec.describe OmniAuth::Strategies::Cognito do
         {
           sub: id_sub,
           iat: now.to_i,
-          iss: 'https://cognito-idp.eu-west-1.amazonaws.com/user_pool_id',
+          iss: 'https://cognito.eu-west-1.amazonaws.com/user_pool_id',
           nbf: now.to_i,
           exp: token_expires.to_i,
           aud: strategy.options[:client_id],
@@ -95,7 +118,7 @@ RSpec.describe OmniAuth::Strategies::Cognito do
       )
     end
 
-    let(:callback_url) { 'http://localhost/auth/cognito-idp/callback?code=1234' }
+    let(:callback_url) { 'http://localhost/auth/cognito/callback?code=1234' }
 
     before do
       allow(strategy).to receive(:env).and_return(env)
@@ -149,7 +172,7 @@ RSpec.describe OmniAuth::Strategies::Cognito do
             'phone_number' => id_phone,
             'email' => id_email,
             'name' => id_name,
-            'iss' => 'https://cognito-idp.eu-west-1.amazonaws.com/user_pool_id',
+            'iss' => 'https://cognito.eu-west-1.amazonaws.com/user_pool_id',
             'aud' => strategy.options[:client_id],
             'exp' => token_expires.to_i,
             'iat' => now.to_i,
