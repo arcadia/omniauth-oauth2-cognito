@@ -1,14 +1,9 @@
 require 'bundler/setup'
-require 'omniauth_oauth2_cognito'
+require 'omniauth-oauth2-cognito'
 require 'byebug'
 require 'simplecov'
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
-
-SimpleCov.start do
-  add_filter 'spec/'
-  add_filter 'lib/omniauth_cognito_idp/version'
-end
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

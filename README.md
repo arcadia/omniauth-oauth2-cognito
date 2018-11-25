@@ -9,7 +9,7 @@ In order to use, follow the installation and usage guides below.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'omniauth-oauth2-cognito', github: 'arcadia/omniauth-oauth2-cognito'
+gem 'omniauth-oauth2-cognito', git: 'git@github.com:arcadia/omniauth-oauth2-cognito.git'
 ```
 
 And then execute:

@@ -1,6 +1,6 @@
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'omniauth_oauth2_cognito/version'
+require 'omniauth-oauth2-cognito/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'omniauth-oauth2-cognito'
