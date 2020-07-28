@@ -16,7 +16,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     hashie (3.5.7)
     jaro_winkler (1.5.1)
-    json (2.1.0)
+    json (2.3.1)
     jwt (2.1.0)
     multi_json (1.13.1)
     multi_xml (0.6.0)
